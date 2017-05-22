@@ -170,11 +170,13 @@ class MispSrv @Inject() (
       // get related alert
       .mapAsyncUnordered(1) {
         case (mcfg, lastSyncDate, event) ⇒
+          logger.trace(s"Looking for alert misp:${event.source}:${event.sourceRef}")
           alertSrv.get("misp", event.source, event.sourceRef)
             .map(a ⇒ (mcfg, lastSyncDate, event, a))
       }
       .mapAsyncUnordered(1) {
         case (mcfg, lastSyncDate, event, alert) ⇒
+          logger.trace(s"MISP synchro ${mcfg.name} last sync at $lastSyncDate, event ${event.sourceRef}, alert ${alert.fold("no alert")("alert" + _.alertId())}")
           logger.info(s"getting MISP event ${event.sourceRef}")
           getAttributes(mcfg, event.sourceRef, Some(lastSyncDate))
             .map((mcfg, event, alert, _))
@@ -182,7 +184,7 @@ class MispSrv @Inject() (
       .mapAsyncUnordered(1) {
         // if there is no related alert, create a new one
         case (mcfg, event, None, attrs) ⇒
-          logger.info(s"MISP event ${event.sourceRef} has no related alert, create it")
+          logger.info(s"MISP event ${event.sourceRef} has no related alert, create it with ${attrs.size} observable(s)")
           val alertJson = Json.toJson(event).as[JsObject] +
             ("type" → JsString("misp")) +
             ("caseTemplate" → mcfg.caseTemplate.fold[JsValue](JsNull)(JsString)) +
@@ -193,7 +195,7 @@ class MispSrv @Inject() (
 
         // if a related alert exists, update it
         case (_, event, Some(alert), attrs) ⇒
-          logger.info(s"MISP event ${event.sourceRef} has related alert, update it")
+          logger.info(s"MISP event ${event.sourceRef} has related alert, update it with ${attrs.size} observable(s)")
           val alertJson = Json.toJson(event).as[JsObject] -
             "type" -
             "source" -
