@@ -56,7 +56,7 @@ class AuditModel(
   }
 
   def mergeAttributes(context: String, attributes: Seq[Attribute[_]]): Option[ObjectAttributeFormat] = {
-    val mergeAttributes = attributes
+    val mergeAttributes: Iterable[Option[Attribute[_]]] = attributes
       .groupBy(_.name)
       .map {
         case (_name, _attributes) ⇒
@@ -67,9 +67,9 @@ class AuditModel(
               case _                    ⇒ None
             }
             .map {
-              case oaf: OptionalAttributeFormat[_] ⇒ oaf
-              case maf: MultiAttributeFormat[_]    ⇒ maf
-              case f                               ⇒ OptionalAttributeFormat(f)
+              case oaf: OptionalAttributeFormat[_] ⇒ oaf: AttributeFormat[_]
+              case maf: MultiAttributeFormat[_]    ⇒ maf: AttributeFormat[_]
+              case f                               ⇒ OptionalAttributeFormat(f): AttributeFormat[_]
             }
             .map(format ⇒ Attribute("audit", _name, format, Nil, None, ""))
             .orElse {
