@@ -64,6 +64,8 @@
 					<th>TLP</th>
 					<th>Case</th>
 					<th>Date added</th>
+                    <th>Labels</th>
+                    <th>Description</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -73,6 +75,8 @@
                         #{{a.case.caseId}} - {{a.case.title}}
                     </td>
 					<td>{{a.startDate | showDate}}</td>
+                    <td>{{a.tags}}</td>
+                    <td>{{a.message}}</td>
 				</tr>
 			</tbody>
 		</table>
