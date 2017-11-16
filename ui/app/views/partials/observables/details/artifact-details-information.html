@@ -75,7 +75,7 @@
                         #{{a.case.caseId}} - {{a.case.title}}
                     </td>
 					<td>{{a.startDate | showDate}}</td>
-                    <td>{{a.tags}}</td>
+                    <td><updatable-tags value="a.tags" on-update="updateField('tags', getLabels(newValue))"></updatable-tags></td>
                     <td>{{a.message}}</td>
 				</tr>
 			</tbody>
